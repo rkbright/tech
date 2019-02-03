@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>B.2. Organization of the Filesystem Hierarchy</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="generator" content="publican 3.0" /><meta name="package" content="Debian-debian-handbook-6.0-en-US-1.0-1" /><meta name="keywords" content="BIOS, Kernel, Unix, Process, Hierarchy, Basic Commands" /><link rel="home" href="index.html" title="The Debian Administrator's Handbook" /><link rel="up" href="short-remedial-course.html" title="Appendix B. Short Remedial Course" /><link rel="prev" href="short-remedial-course.html" title="Appendix B. Short Remedial Course" /><link rel="next" href="sect.computer-layers.html" title="B.3. Inner Workings of a Computer: the Different Layers Involved" /></head><body><p class="hidden" id="title"><a class="left" href="http://www.debian.org"><img src="Common_Content/images/image_left.png" alt="Product Site" /></a><a class="right" href="http://debian-handbook.info"><img src="Common_Content/images/image_right.png" alt="Documentation Site" /></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="short-remedial-course.html"><strong>Prev</strong></a></li><li class="home">The Debian Administrator's Handbook</li><li class="next"><a accesskey="n" href="sect.computer-layers.html"><strong>Next</strong></a></li></ul><div class="section"><div class="titlepage"><div><div><h2 class="title" id="sect.filesystem-hierarchy">B.2. Organization of the Filesystem Hierarchy</h2></div></div></div><a id="idp11473664" class="indexterm"></a><div class="section"><div class="titlepage"><div><div><h3 class="title" id="idp11474128">B.2.1. The Root Directory</h3></div></div></div><div class="para"><p></p>
+				A Debian system is organized along the <span class="emphasis"><em>File Hierarchy Standard</em></span> (FHS). This standard defines the purpose of each directory. For instance, the top-level directories are described as follows:
+			</div><div class="itemizedlist"><ul><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/bin/</code>: basic programs;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/boot/</code>: Linux kernel and other files required for its early boot process;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/dev/</code>: device files;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/etc/</code>: configuration files;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/home/</code>: user's personal files;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/lib/</code>: basic libraries;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/media/*</code>: mount points for removable devices (CD-ROM, USB keys and so on);
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/mnt/</code>: temporary mount point;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/opt/</code>: extra applications provided by third parties;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/root/</code>: administrator's (root's) personal files;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/sbin/</code>: system programs;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/srv/</code>: data used by servers hosted on this system;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/tmp/</code>: temporary files; this directory is often emptied at boot;
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/usr/</code>: applications; this directory is further subdivided into <code class="filename">bin</code>, <code class="filename">sbin</code>, <code class="filename">lib</code> (according to the same logic as in the root directory). Furthermore, <code class="filename">/usr/share/</code> contains architecture-independent data. <code class="filename">/usr/local/</code> is meant to be used by the administrator for installing applications manually without overwriting files handled by the packaging system (<code class="command">dpkg</code>).
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/var/</code>: variable data handled by daemons. This includes log files, queues, spools, caches and so on.
+					</div></li><li class="listitem"><div class="para"><p></p>
+						<code class="filename">/proc/</code> and <code class="filename">/sys/</code> are specific to the Linux kernel (and not part of the FHS). They are used by the kernel for exporting data to user-space.
+					</div></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title" id="idp11525824">B.2.2. The User's Home Directory</h3></div></div></div><div class="para"><p></p>
+				The contents of a user's home directory is not standardized, but there are still a few noteworthy conventions. One is that a user's home directory is often referred to by a tilde (“~”). That is useful to know because command interpreters automatically replace a tilde with the correct directory (usually <code class="filename">/home/<em class="replaceable"><code>user</code></em>/</code>).
+			</div><div class="para"><p></p>
+				Application configuration files are often stored directly under the user's home directory, but their names usually start with a dot (for instance, the <code class="command">mutt</code> email client stores its configuration in <code class="filename">~/.muttrc</code>). Filenames that start with a dot are hidden by default, and <code class="command">ls</code> only lists them when the <code class="literal">-a</code> option is used.
+			</div><div class="para"><p></p>
+				Some programs use multiple configuration files organized in one directory (for instance, <code class="filename">~/.evolution/</code>). Some applications (such as the Iceweasel web browser) also use their directory to store a cache of downloaded data. This means that those directories can end up using a lot of disk space.
+			</div><div class="para"><p></p>
+				Graphical desktops usually display the contents of the <code class="filename">~/Desktop/</code> directory (or <code class="filename">~/Bureau/</code> or whatever the appropriate translation is for systems not configured in English) on the desktop (ie, what's visible on screen once all applications are closed or iconized).
+			</div><div class="para"><p></p>
+				Finally, the email system sometimes stores incoming emails into a <code class="filename">~/Mail/</code> directory.
+			</div></div></div><div id="site_footer"></div><script type="text/javascript">
+		$("#site_footer").load("../../../../../footer.html");
+	</script><ul class="docnav"><li class="previous"><a accesskey="p" href="short-remedial-course.html"><strong>Prev</strong>Appendix B. Short Remedial Course</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="sect.computer-layers.html"><strong>Next</strong>B.3. Inner Workings of a Computer: the Different ...</a></li></ul></body></html>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>5.4. Manipulating Packages with dpkg</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="generator" content="publican 3.0" /><meta name="package" content="Debian-debian-handbook-6.0-en-US-1.0-1" /><meta name="keywords" content="Binary package, Source package, dpkg, dependencies, conflict" /><link rel="home" href="index.html" title="The Debian Administrator's Handbook" /><link rel="up" href="packaging-system.html" title="Chapter 5. Packaging System: Tools and Fundamental Principles" /><link rel="prev" href="sect.source-package-structure.html" title="5.3. Structure of a Source Package" /><link rel="next" href="sect.coexistence-with-other-packaging-systems.html" title="5.5. Coexistence with Other Packaging Systems" /></head><body><p class="hidden" id="title"><a class="left" href="http://www.debian.org"><img src="Common_Content/images/image_left.png" alt="Product Site" /></a><a class="right" href="http://debian-handbook.info"><img src="Common_Content/images/image_right.png" alt="Documentation Site" /></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="sect.source-package-structure.html"><strong>Prev</strong></a></li><li class="home">The Debian Administrator's Handbook</li><li class="next"><a accesskey="n" href="sect.coexistence-with-other-packaging-systems.html"><strong>Next</strong></a></li></ul><div class="section"><div class="titlepage"><div><div><h2 class="title" id="sect.manipulating-packages-with-dpkg">5.4. Manipulating Packages with <code class="command">dpkg</code></h2></div></div></div><a id="idp12708688" class="indexterm"></a><div class="para"><p></p>
+			<code class="command">dpkg</code> is the base command for handling Debian packages on the system. If you have <code class="filename">.deb</code> packages, it is <code class="command">dpkg</code> that allows installation or analysis of their contents. But this program only has a partial view of the Debian universe: it knows what is installed on the system, and whatever it is given on the command line, but knows nothing of the other available packages. As such, it will fail if a dependency is not met. Tools such as <code class="command">apt-get</code>, on the contrary, will create a list of dependencies to be installed as automatically as possible.
+		</div><div class="sidebar"><div class="titlepage"><div><div><h6><span class="emphasis"><em>NOTE</em></span> <code class="command">dpkg</code> or <code class="command">apt-get</code>?</h6></div></div></div><div class="para"><p></p>
+			<code class="command">dpkg</code> should be seen as a system tool (backend), and <code class="command">apt-get</code> as a tool closer to the user, which overcomes the previous limitations. These tools work together, each one with its particularities, suited to specific tasks.
+		</div></div><div class="section"><div class="titlepage"><div><div><h3 class="title" id="idp12712952">5.4.1. Installing Packages</h3></div></div></div><a id="idp12713336" class="indexterm"></a><a id="idp12714040" class="indexterm"></a><div class="para"><p></p>
+				<code class="command">dpkg</code> is, above all, a tool for installing an already available Debian package (because it does not download anything). To do this, we use its <code class="literal">-i</code> or <code class="literal">--install</code> option.
+			</div><div class="example"><h6>Example 5.2. Installation of a package with <code class="command">dpkg</code></h6><div class="example-contents"><pre class="screen scale">
+<code class="computeroutput"># </code><strong class="userinput"><code>dpkg -i man-db_2.5.7-4_i386.deb</code></strong>
+<code class="computeroutput">(Reading database... 284247 files and directories currently installed.)
+Preparing replacement man-db 2.5.7-3 (using .../man-db_2.5.7-4_i386.deb) ...
+Unpacking the man-db update...
+Configuring man-db (2.5.7-4) ...
+Updating database of manual pages ...
+Processing triggers for “doc-base”...
+Processing 1 modified documentation file(s) 
+Recording documents with scrollkeeper ... </code></pre></div></div><br class="example-break" /><div class="para"><p></p>
+				We can see the different steps performed by <code class="command">dpkg</code>; we know, thus, at what point any error may have occurred. The installation can also be effected in two stages: first unpacking, then configuration. <code class="command">apt-get</code> takes advantage of this, limiting the number of calls to <code class="command">dpkg</code> (since each call is costly, due to loading of the database in memory, especially the list of already installed files).
+			</div><div class="example"><h6>Example 5.3. Separate unpacking and configuration</h6><div class="example-contents"><pre class="screen scale">
+<code class="computeroutput"># </code><strong class="userinput"><code>dpkg --unpack man-db_2.5.7-4_i386.deb</code></strong>
+<code class="computeroutput">(Reading database... 284247 files already installed.)
+Preparing replacement of man-db 2.5.7-3 (using .../man-db_2.5.7-4_i386.deb) ...
+Unpacking the man-db update...
+Processing triggers for “doc-base”...
+Treatment of a modified documentation file(s) 
+Recording documents with scrollkeeper ... 
+# </code><strong class="userinput"><code> dpkg --configure man-db</code></strong>
+<code class="computeroutput">Configuring man-db (2.5.7-4) ...
+Updating database of manual pages ...</code></pre></div></div><br class="example-break" /><a id="idp12721240" class="indexterm"></a><div class="para"><p></p>
+				Sometimes <code class="command">dpkg</code> will fail to install a package and return an error; if the user orders it to ignore this, it will only issue a warning; it is for this reason that we have the different <code class="literal">--force-*</code> options. The <code class="command">dpkg --force-help</code> command, or documentation of this command, will give a complete list of these options. The most frequent error, which you are bound to encounter sooner or later, is a file collision. When a package contains a file that is already installed by another package, <code class="command">dpkg</code> will refuse to install it. The following messages will then appear:
+			</div><pre class="screen">
+<code class="computeroutput">Unpacking libisc52 (from .../libisc52_1%3a9.6.ESV.R1+dfsg-0+lenny2_amd64.deb) ...
+dpkg : error processing /var/cache/apt/archives/libisc52_1%3a9.6.ESV.R1+dfsg-0+lenny2_amd64.deb (--unpack) :
+ trying to overwrite "/usr/lib/libisc.so.50", which is also in package libisc50 1:9.6.1.dfsg.P1-3</code></pre><div class="para"><p></p>
+				In this case, if you think that replacing this file is not a significant risk to the stability of your system (which is usually the case), you can use the option <code class="literal">--force-overwrite</code>, which tells <code class="command">dpkg</code> to ignore this error and overwrite the file.
+			</div><div class="para"><p></p>
+				While there are many available <code class="literal">--force-*</code> options, only <code class="literal">--force-overwrite</code> is likely to be used regularly. These options only exist for exceptional situations, and it is better to leave them alone as much as possible in order to respect the rules imposed by the packaging mechanism. Do not forget, these rules ensure the consistency and stability of your system.
+			</div><div class="sidebar"><div class="titlepage"><div><div><h6><span class="emphasis"><em>CAUTION</em></span> Effective use of <code class="literal">--force-*</code></h6></div></div></div><a id="idp12726856" class="indexterm"></a><div class="para"><p></p>
+				If you are not careful, the use of an option <code class="literal">--force-*</code> can lead to a system where the APT family of commands will refuse to function. In effect, some of these options allow installation of a package when a dependency is not met, or when there is a conflict. The result is an inconsistent system from the point of view of dependencies, and the APT commands will refuse to execute any action unless the action enables it to return the system to a consistent state (this often consists of installing the missing dependency or removing a problematic package). This often results in a message like this one, obtained after installing a new version of <span class="pkg pkg">rdesktop</span> while ignoring its dependency on a newer version of the <span class="pkg pkg">libc6</span>:
+			</div><pre class="programlisting"># apt-get dist-upgrade
+[...]
+You can run "apt-get -f install" to correct these problems.
+The following packages contain unmet dependencies:
+  rdesktop: Depends on: libc6 (&gt;= 2.5) but 2.3.6.ds1-13etch7 is installed
+E: missing dependencies. Try to use the option -f.
+</pre><div class="para"><p></p>
+				A courageous administrator who is certain of the correctness of their analysis may choose to ignore a dependency or conflict and use the corresponding <code class="literal">--force-*</code> option. In this case, if they want to be able to continue to use <code class="command">apt-get</code> or <code class="command">aptitude</code>, they must edit <code class="filename">/var/lib/dpkg/status</code> to delete/modify the dependency, or conflict, that they chose to override.
+			</div><div class="para"><p></p>
+				This manipulation is an ugly hack, and should never be used, except in the most extreme case of necessity. Quite frequently, a more fitting solution is to recompile the package that's causing the problem (see <a class="xref" href="debian-packaging.html#sect.rebuilding-package">Section 15.1, “Rebuilding a Package from its Sources”</a>) or use a new version (potentially corrected) from a site such as <code class="literal">backports.debian.org</code> (see <a class="xref" href="apt.html#section.backports">Section 6.1.1.2, “The Backports From <code class="literal">backports.debian.org</code>”</a>).
+			</div></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title" id="idp12732664">5.4.2. Package Removal</h3></div></div></div><a id="idp12733048" class="indexterm"></a><a id="idp12733512" class="indexterm"></a><a id="idp12733976" class="indexterm"></a><a id="idp12734696" class="indexterm"></a><div class="para"><p></p>
+				Invoking <code class="command">dpkg</code> with the <code class="literal">-r</code> or <code class="literal">--remove</code> option, followed by the name of a package, removes that package. This removal is, however, not complete: all of the configuration files and scripts, log files (system logs) and other user data handled by the package remain. The reason for keeping them is to disable the program by uninstalling it, while preserving the option to reinstall it quickly and with the same configurations. To completely remove everything associated with a package, use the <code class="literal">-P</code> or <code class="literal">--purge</code> option, followed by the package name.
+			</div><div class="example"><h6>Example 5.4. Removal and purge of the <span class="emphasis"><em>debian-cd</em></span> package</h6><div class="example-contents"><pre class="screen"><code class="computeroutput"># </code><strong class="userinput"><code>dpkg -r debian-cd</code></strong>
+<code class="computeroutput">(Reading database... 14170 files and directories already installed.)
+Removing debian-cd ...
+# </code><strong class="userinput"><code>dpkg -P debian-cd</code></strong>
+<code class="computeroutput">(Reading database... 13794 files and directories already installed.)
+Removing debian-cd ...
+Removing debian-cd configuration files...</code></pre></div></div><br class="example-break" /></div><div class="section"><div class="titlepage"><div><div><h3 class="title" id="idp12739360">5.4.3. Other <code class="command">dpkg</code> Features</h3></div></div></div><a id="idp12740000" class="indexterm"></a><a id="idp12903064" class="indexterm"></a><a id="idp12903784" class="indexterm"></a><div class="sidebar"><div class="titlepage"><div><div><h6><span class="emphasis"><em>BACK TO BASICS</em></span> Option syntax</h6></div></div></div><div class="para"><p></p>
+				Most options are available in the “long” version (one or more relevant words, preceded by a double dash) or a “short” version (a single letter, often the initial of one word from the long version, and preceded by a single dash). This convention is so common that it is a POSIX standard. 
+				<a id="idp12905472" class="indexterm"></a>
+				 <a id="idp12905952" class="indexterm"></a>
+			</div></div><div class="para"><p></p>
+				Before concluding this section, we note that some <code class="command">dpkg</code> options may query the internal database in order to obtain information. Giving first the long options and then corresponding short options (that will evidently take the same possible arguments) we cite <code class="literal">--listfiles <em class="replaceable"><code>package</code></em></code> (or <code class="literal">-L</code>), which lists the files installed by this package; <code class="literal">--search <em class="replaceable"><code>file</code></em></code> (or <code class="literal">-S</code>), which finds the package from which the file comes; <code class="literal">--status <em class="replaceable"><code>package</code></em></code> (or <code class="literal">-s</code>), which displays the headers of an installed package; <code class="literal">--list</code> (or <code class="literal">-l</code>), which displays the list of packages known to the system and their installation status; <code class="literal">--contents <em class="replaceable"><code>file.deb</code></em></code> (or <code class="literal">-c</code>), which lists the files in the Debian package specified; <code class="literal">--info<em class="replaceable"><code> file.deb </code></em></code> (or <code class="literal">-I</code>), which displays the headers of the Debian package.
+			</div><div class="example"><h6>Example 5.5. Various queries with <code class="command">dpkg</code></h6><div class="example-contents"><pre class="screen scale" width="80">
+<code class="computeroutput">$ </code><strong class="userinput"><code>dpkg -L base-passwd</code></strong>
+<code class="computeroutput">/.
+/usr
+/usr/sbin
+/usr/sbin/update-passwd
+/usr/share
+/usr/share/man
+/usr/share/man/ru
+/usr/share/man/ru/man8
+/usr/share/man/ru/man8/update-passwd.8.gz
+/usr/share/man/pl
+/usr/share/man/pl/man8
+/usr/share/man/pl/man8/update-passwd.8.gz
+/usr/share/man/man8
+/usr/share/man/man8/update-passwd.8.gz
+/usr/share/man/fr
+/usr/share/man/fr/man8
+/usr/share/man/fr/man8/update-passwd.8.gz
+/usr/share/doc-base
+/usr/share/doc-base/users-and-groups
+/usr/share/base-passwd
+/usr/share/base-passwd/passwd.master
+/usr/share/base-passwd/group.master
+/usr/share/lintian
+/usr/share/lintian/overrides
+/usr/share/lintian/overrides/base-passwd
+/usr/share/doc
+/usr/share/doc/base-passwd
+/usr/share/doc/base-passwd/copyright
+/usr/share/doc/base-passwd/users-and-groups.html
+/usr/share/doc/base-passwd/changelog.gz
+/usr/share/doc/base-passwd/users-and-groups.txt.gz
+/usr/share/doc/base-passwd/README
+$ </code><strong class="userinput"><code>dpkg -S /bin/date</code></strong>
+<code class="computeroutput">coreutils: /bin/date
+$ </code><strong class="userinput"><code>dpkg -s coreutils</code></strong>
+<code class="computeroutput">Package: coreutils
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: utils
+Installed-Size: 12188
+Maintainer: Michael Stone &lt;mstone@debian.org&gt;
+Architecture: i386
+Version: 8.5-1
+Replaces: mktemp, timeout
+Pre-Depends: libacl1 (&gt;= 2.2.11-1), libattr1 (&gt;= 2.4.41-1), libc6 (&gt;= 2.6), libselinux1 (&gt;= 1.32)
+Conflicts: timeout
+Description: GNU core utilities
+ This package contains the basic file, shell and text manipulation
+ utilities which are expected to exist on every operating system.
+ .
+ Specifically, this package includes:
+ arch base64 basename cat chcon chgrp chmod chown chroot cksum comm cp
+ csplit cut date dd df dir dircolors dirname du echo env expand expr
+ factor false flock fmt fold groups head hostid id install join link ln
+ logname ls md5sum mkdir mkfifo mknod mktemp mv nice nl nohup nproc od
+ paste pathchk pinky pr printenv printf ptx pwd readlink rm rmdir runcon
+ sha*sum seq shred sleep sort split stat stty sum sync tac tail tee test
+ timeout touch tr true truncate tsort tty uname unexpand uniq unlink
+ users vdir wc who whoami yes
+Homepage: http://gnu.org/software/coreutils
+$ </code><strong class="userinput"><code>dpkg -l 'b*' | head</code></strong>
+<code class="computeroutput">Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                   Version    Description
++++-===================-==========-============================================
+un  backupninja         &lt;none&gt;    (no description available)
+un  base                &lt;none&gt;    (no description available)
+un  base-config         &lt;none&gt;    (no description available)
+ii  base-files          4          Debian base system miscellaneous files
+ii  base-passwd         3.5.11     Debian base system master password and group
+$ </code><strong class="userinput"><code>dpkg -c /var/cache/apt/archives/iceweasel_2.0.0.18-0etch1_i386.deb</code></strong>
+<code class="computeroutput">
+drwxr-xr-x root/root         0 2008-11-23 23:18 ./
+drwxr-xr-x root/root         0 2008-11-23 23:16 ./etc/
+drwxr-xr-x root/root         0 2008-11-23 23:18 ./etc/iceweasel/
+drwxr-xr-x root/root         0 2008-11-23 23:18 ./etc/iceweasel/profile/
+-rw-r--r-- root/root      7138 2006-08-19 08:04 ./etc/iceweasel/profile/bookmarks.html
+-rw-r--r-- root/root       153 2006-09-14 19:13 ./etc/iceweasel/profile/localstore.rdf
+-rw-r--r-- root/root      3287 2005-02-01 18:36 ./etc/iceweasel/profile/search.rdf
+-rw-r--r-- root/root       287 2004-11-30 22:26 ./etc/iceweasel/profile/mimeTypes.rdf
+drwxr-xr-x root/root         0 2008-11-23 23:18 ./etc/iceweasel/profile/chrome/
+-rw-r--r-- root/root      1078 2004-11-30 22:26 ./etc/iceweasel/profile/chrome/userChrome-example.css
+-rw-r--r-- root/root       663 2004-11-30 22:26 ./etc/iceweasel/profile/chrome/userContent-example.css
+-rw-r--r-- root/root       347 2004-07-28 23:20 ./etc/iceweasel/profile/prefs.js
+-rw-r--r-- root/root        53 2008-11-23 22:43 ./etc/iceweasel/iceweaselrc
+[...]
+$ </code><strong class="userinput"><code>dpkg -I /var/cache/apt/archives/iceweasel_2.0.0.18-0etch1_i386.deb</code></strong>
+<code class="computeroutput"> new Debian package, version 2.0.
+ size 9126828 bytes : control file = 37297 bytes.
+     346 bytes,     9 lines      conffiles            
+    1255 bytes,    20 lines      control              
+  122920 bytes,  1249 lines      md5sums              
+    1267 bytes,    37 lines   *  postinst             #!/bin/sh
+     293 bytes,     8 lines   *  postrm               #!/bin/sh
+    2763 bytes,    70 lines   *  preinst              #!/bin/sh
+     274 bytes,    12 lines   *  prerm                #!/bin/sh
+ Package: iceweasel
+ Version: 2.0.0.18-0etch1
+ Section: web
+ Priority: optional
+ Architecture: i386
+ Depends: fontconfig, psmisc, debianutils (&gt;= 1.16), libatk1.0-0 (&gt;= 1.12.2), libc6 (&gt;= 2.3.6-6)...
+ Suggests: iceweasel-gnome-support (= 2.0.0.18-0etch1), latex-xft-fonts, xprint, mozplugger, libkrb53
+ Conflicts: mozilla-firefox (&lt;&lt; 1.5.dfsg-1), firefox (&lt;&lt; 2.0+dfsg-1)
+ Replaces: mozilla-firefox, firefox (&lt;&lt; 2.0+dfsg-1)
+ Provides: www-browser
+ Installed-Size: 26364
+ Maintainer: Eric Dorland &lt;eric@debian.org&gt;
+ Description: lightweight web browser based on Mozilla
+  Iceweasel is a redesign of the Mozilla browser component, similar to
+  Galeon, K-Meleon and Camino, but written using the XUL user interface
+  language and designed to be lightweight and cross-platform.
+  .
+  This browser is based on the Firefox source-code, with minor
+  modifications. Historically, this browser was previously known as
+  Firebird and Phoenix.
+</code></pre></div></div><br class="example-break" /><div class="sidebar important"><div class="titlepage"><div><div><h6><span class="emphasis"><em>GOING FURTHER</em></span> Comparison of versions</h6></div></div></div><a id="idp12920944" class="indexterm"></a><a id="idp12921408" class="indexterm"></a><div class="para"><p></p>
+				Since <code class="command">dpkg</code> is the program for handling Debian packages, it also provides the reference implementation of the logic of comparing version numbers. This is why it has a <code class="literal">--compare-versions</code> option, usable by external programs (especially configuration scripts executed by <code class="command">dpkg</code> itself). This option requires three parameters: a version number, a comparison operator, and a second version number. The different possible operators are <code class="literal">lt</code> (strictly less than), <code class="literal">le</code> (less than or equal to), <code class="literal">eq</code> (equal), <code class="literal">ne</code> (not equal), <code class="literal">ge</code> (greater than or equal to), and <code class="literal">gt</code> (strictly greater than). If the comparison is correct, <code class="command">dpkg</code> gives the return code, 0 (success); if not, it gives a non-zero return value (indicating failure).
+			</div><pre class="screen">
+<code class="computeroutput">$ </code><strong class="userinput"><code>dpkg --compare-versions 1.2-3 gt 1.1-4</code></strong>
+<code class="computeroutput">$ </code><strong class="userinput"><code>echo $?</code></strong>
+<code class="computeroutput">0
+$ </code><strong class="userinput"><code>dpkg --compare-versions 1.2-3 lt 1.1-4</code></strong>
+<code class="computeroutput">$ </code><strong class="userinput"><code>echo $?</code></strong>
+<code class="computeroutput">1
+$ </code><strong class="userinput"><code>dpkg --compare-versions 2.6.0pre3-1 lt 2.6.0-1</code></strong>
+<code class="computeroutput">$ </code><strong class="userinput"><code>echo $?</code></strong>
+<code class="computeroutput">1</code></pre><div class="para"><p></p>
+				Note the unexpected failure of the last comparison: for <code class="command">dpkg</code>, <code class="literal">pre</code>, usually denoting a pre-release, has no particular meaning, and this program compares the alphabetic characters in the same way as the numbers (a &lt;b &lt;c ...), in alphabetical order. This is why it considers “<code class="literal">0pre3</code>” to be greater than “<code class="literal">0</code>”. When we want a package's version number to indicate that it is a pre-release, we use the tilde character, “<code class="literal">~</code>”:
+			</div><pre class="screen">
+<code class="computeroutput">$ </code><strong class="userinput"><code>dpkg --compare-versions 2.6.0~pre3-1 lt 2.6.0-1</code></strong>
+<code class="computeroutput">$ </code><strong class="userinput"><code>echo $?</code></strong>
+<code class="computeroutput">0</code></pre></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title" id="idp12930920">5.4.4. <code class="command">dpkg</code>'s Log File</h3></div></div></div><div class="para"><p></p>
+				A recently introduced feature in <code class="command">dpkg</code> is that it keeps a log of all of its actions in <code class="filename">/var/log/dpkg.log</code>. This log is extremely verbose, since it details every one of the stages through which packages handled by <code class="command">dpkg</code> go. In addition to offering a way to track dpkg's behavior, it helps, above all, to keep a history of the development of the system: one can find the exact moment when each package has been installed or updated, and this information can be extremely useful in understanding a recent change in behavior. Additionally, all versions being recorded, it is easy to cross-check the information with the <code class="filename">changelog.Debian.gz</code> for packages in question, or even with online bug reports.
+			</div></div></div><div id="site_footer"></div><script type="text/javascript">
+		$("#site_footer").load("../../../../../footer.html");
+	</script><ul class="docnav"><li class="previous"><a accesskey="p" href="sect.source-package-structure.html"><strong>Prev</strong>5.3. Structure of a Source Package</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="sect.coexistence-with-other-packaging-systems.html"><strong>Next</strong>5.5. Coexistence with Other Packaging Systems</a></li></ul></body></html>

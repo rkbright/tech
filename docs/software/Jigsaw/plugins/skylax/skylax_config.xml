@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<views.skylax.geocoder.SimpleGeocoderHandler>
+		<geocoders>
+			<geocoder id="views.skylax.geocoder.GeonamesGeocoder">
+				<mode>fast</mode>
+				<limit>1</limit>
+				<radlimit>0.5</radlimit>
+				<dbUrl>jdbc:mysql://puttputt.cc.gt.atl.ga.us/geonames</dbUrl>
+				<dbUser>geo</dbUser>
+				<dbPswd>geo</dbPswd>
+			</geocoder>
+		</geocoders>
+	</views.skylax.geocoder.SimpleGeocoderHandler>
+</config>

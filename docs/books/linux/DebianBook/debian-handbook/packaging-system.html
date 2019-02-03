@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Chapter 5. Packaging System: Tools and Fundamental Principles</title><link rel="stylesheet" type="text/css" href="Common_Content/css/default.css" /><link rel="stylesheet" media="print" href="Common_Content/css/print.css" type="text/css" /><meta name="generator" content="publican 3.0" /><meta name="package" content="Debian-debian-handbook-6.0-en-US-1.0-1" /><meta name="keywords" content="Binary package, Source package, dpkg, dependencies, conflict" /><link rel="home" href="index.html" title="The Debian Administrator's Handbook" /><link rel="up" href="index.html" title="The Debian Administrator's Handbook" /><link rel="prev" href="sect.after-first-boot.html" title="4.3. After the First Boot" /><link rel="next" href="sect.package-meta-information.html" title="5.2. Package Meta-Information" /></head><body><p class="hidden" id="title"><a class="left" href="http://www.debian.org"><img src="Common_Content/images/image_left.png" alt="Product Site" /></a><a class="right" href="http://debian-handbook.info"><img src="Common_Content/images/image_right.png" alt="Documentation Site" /></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="sect.after-first-boot.html"><strong>Prev</strong></a></li><li class="home">The Debian Administrator's Handbook</li><li class="next"><a accesskey="n" href="sect.package-meta-information.html"><strong>Next</strong></a></li></ul><div class="chapter" id="packaging-system"><div class="titlepage"><div><div><h2 class="title">Chapter 5. Packaging System: Tools and Fundamental Principles</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="packaging-system.html#sect.binary-package-structure">5.1. Structure of a Binary Package</a></span></dt><dt><span class="section"><a href="sect.package-meta-information.html">5.2. Package Meta-Information</a></span></dt><dd><dl><dt><span class="section"><a href="sect.package-meta-information.html#section.control">5.2.1. Description: the <code class="filename">control</code> File</a></span></dt><dt><span class="section"><a href="sect.package-meta-information.html#idp12822624">5.2.2. Configuration Scripts</a></span></dt><dt><span class="section"><a href="sect.package-meta-information.html#section.conffiles">5.2.3. Checksums, List of Configuration Files</a></span></dt></dl></dd><dt><span class="section"><a href="sect.source-package-structure.html">5.3. Structure of a Source Package</a></span></dt><dd><dl><dt><span class="section"><a href="sect.source-package-structure.html#idp12678920">5.3.1. Format</a></span></dt><dt><span class="section"><a href="sect.source-package-structure.html#idp12705800">5.3.2. Usage within Debian</a></span></dt></dl></dd><dt><span class="section"><a href="sect.manipulating-packages-with-dpkg.html">5.4. Manipulating Packages with <code class="command">dpkg</code></a></span></dt><dd><dl><dt><span class="section"><a href="sect.manipulating-packages-with-dpkg.html#idp12712952">5.4.1. Installing Packages</a></span></dt><dt><span class="section"><a href="sect.manipulating-packages-with-dpkg.html#idp12732664">5.4.2. Package Removal</a></span></dt><dt><span class="section"><a href="sect.manipulating-packages-with-dpkg.html#idp12739360">5.4.3. Other <code class="command">dpkg</code> Features</a></span></dt><dt><span class="section"><a href="sect.manipulating-packages-with-dpkg.html#idp12930920">5.4.4. <code class="command">dpkg</code>'s Log File</a></span></dt></dl></dd><dt><span class="section"><a href="sect.coexistence-with-other-packaging-systems.html">5.5. Coexistence with Other Packaging Systems</a></span></dt></dl></div><div class="highlights"><div class="para"><p></p>
+		As a Debian system administrator, you will routinely handle <code class="filename">.deb</code> packages, since they contain consistent functional units (applications, documentation, etc.), whose installation and maintenance they facilitate. It is therefore a good idea to know what they are and how to use them.
+	</div></div><div class="para"><p></p>
+		This chapter describes the structure and contents of “binary” and “source” packages. The former are <code class="filename">.deb</code> files, directly usable by <code class="command">dpkg</code>, while the latter contain the program source code, as well as instructions for building binary packages.
+	</div><div class="section"><div class="titlepage"><div><div><h2 class="title" id="sect.binary-package-structure">5.1. Structure of a Binary Package</h2></div></div></div><a id="idp58224" class="indexterm"></a><a id="idp3343688" class="indexterm"></a><div class="para"><p></p>
+			The Debian package format is designed so that its content may be extracted on any Unix system that has the classic commands <code class="command">ar</code>, <code class="command">tar</code>, and <code class="command">gzip</code>. This seemingly trivial property is important for portability and disaster recovery.
+		</div><div class="para"><p></p>
+			Imagine, for example, that you mistakenly deleted the <code class="command">dpkg</code> program, and that you could thus no longer install Debian packages. <code class="command">dpkg</code> being a Debian package itself, it would seem your system would be done for... Fortunately, you know the format of a package and can therefore download the <code class="filename">.deb</code> file of the <span class="pkg pkg">dpkg</span> package and install it manually (see the “TOOLS” sidebar). If by some misfortune one or more of the programs <code class="command">ar</code>, <code class="command">tar</code> or <code class="command">gzip</code> have disappeared, you will only need to copy the missing program from another system (since each of these operates in a completely autonomous manner, without dependencies, a simple copy will suffice).
+		</div><div class="sidebar"><a xmlns="" id="cadre.dpkg-apt-ar"></a><div class="titlepage"><div><div><h6><span class="emphasis"><em>TOOLS</em></span> <code class="command">dpkg</code>, <code class="command">APT</code> and <code class="command">ar</code></h6></div></div></div><a id="idp6686248" class="indexterm"></a><a id="idp4633824" class="indexterm"></a><a id="idp4634384" class="indexterm"></a><div class="para"><p></p>
+			<code class="command">dpkg</code> is the program that handles <code class="filename">.deb</code> files, notably extracting, analyzing, and unpacking them.
+		</div><div class="para"><p></p>
+			<code class="command">APT</code> is a group of programs that allows the execution of higher-level modifications to the system: installing or removing a package (while keeping dependencies satisfied), updating the system, listing the available packages, etc.
+		</div><div class="para"><p></p>
+			<a id="idp6986728" class="indexterm"></a>
+			 As for the <code class="command">ar</code> program, it allows handling files of the same name: <code class="command">ar t <em class="replaceable"><code>archive</code></em></code> displays the list of files contained in such an archive, <code class="command">ar x <em class="replaceable"><code>archive</code></em></code> extracts the files from the archive into the current working directory, <code class="command">ar d <em class="replaceable"><code>archive</code></em> <em class="replaceable"><code>file</code></em></code> deletes a file from the archive, etc. Its man page (<span class="citerefentry"><span class="refentrytitle">ar</span>(1)</span>) documents its many other operations. <code class="command">ar</code> is a very rudimentary tool that a Unix administrator would only use on rare occasions, but admins routinely use <code class="command">tar</code>, a more evolved archive and file management program. This is why it is easy to restore <code class="command">dpkg</code> in the event of an erroneous deletion. You would only have to download the Debian package and extract the content from the archive <code class="filename">data.tar.gz</code> in the system's root (<code class="filename">/</code>):
+		</div><pre class="screen">
+<code class="computeroutput"># </code><strong class="userinput"><code>ar x dpkg_1.15.8.5_i386.deb</code></strong>
+<code class="computeroutput"># </code><strong class="userinput"><code>tar -C / -p -xzf data.tar.gz</code></strong></pre></div><div class="sidebar"><div class="titlepage"><div><div><h6><span class="emphasis"><em>BACK TO BASICS</em></span> Man page notation</h6></div></div></div><div class="para"><p></p>
+			It can be confusing for beginners to find references to “<span class="citerefentry"><span class="refentrytitle">ar</span>(1)</span>” in the literature. This is generally a convenient means of referring to the man page entitled <code class="literal">ar</code> in section 1.
+		</div><div class="para"><p></p>
+			Sometimes this notation is also used to remove ambiguities, for example to distinguish between the <code class="command">printf</code> command that can also be indicated by <span class="citerefentry"><span class="refentrytitle">printf</span>(1)</span> and the <code class="function">printf</code> function in the C programming language, which can also be referred to as <span class="citerefentry"><span class="refentrytitle">printf</span>(3)</span>.
+		</div><div class="para"><p></p>
+			<a class="xref" href="solving-problems.html">Chapter 7, <em>Solving Problems and Finding Relevant Information</em></a> discusses manual pages in further detail (see <a class="xref" href="solving-problems.html#section.manuel">Section 7.1.1, “Manual Pages”</a>).
+		</div></div><div class="para"><p></p>
+			Have a look at the content of a <code class="filename">.deb</code> file:
+		</div><pre class="screen"><code class="computeroutput">$ </code><strong class="userinput"><code>ar t dpkg_1.15.8.5_i386.deb</code></strong>
+<code class="computeroutput">debian-binary
+control.tar.gz
+data.tar.gz
+$ </code><strong class="userinput"><code>ar x dpkg_1.15.8.5_i386.deb</code></strong>
+<code class="computeroutput">$ </code><strong class="userinput"><code>ls</code></strong>
+<code class="computeroutput">control.tar.gz  data.tar.gz  debian-binary  dpkg_1.15.8.5_i386.deb
+$ </code><strong class="userinput"><code>tar tzf data.tar.gz | head -15</code></strong>
+<code class="computeroutput">./
+./var/
+./var/lib/
+./var/lib/dpkg/
+./var/lib/dpkg/updates/
+./var/lib/dpkg/parts/
+./var/lib/dpkg/info/
+./var/lib/dpkg/alternatives/
+./sbin/
+./sbin/start-stop-daemon
+./usr/
+./usr/sbin/
+./usr/sbin/install-info
+./usr/bin/
+./usr/bin/dpkg-split
+$ </code><strong class="userinput"><code>tar tzf control.tar.gz</code></strong>
+<code class="computeroutput">./
+./control
+./preinst
+./md5sums
+./conffiles
+./postrm
+./postinst
+$ </code><strong class="userinput"><code>cat debian-binary</code></strong>
+<code class="computeroutput">2.0</code></pre><div class="para"><p></p>
+			As you can see, the <code class="command">ar</code> archive of a Debian package is comprised of three files:
+		</div><div class="itemizedlist"><ul><li class="listitem"><div class="para"><p></p>
+					<code class="filename">debian-binary</code>. This is a text file which simply indicates the version of the <code class="filename">.deb</code> file used (in 2011: version 2.0).
+				</div></li><li class="listitem"><div class="para"><p></p>
+					<code class="filename">control.tar.gz</code>. This archive file contains all of the available meta-information. In it, package management tools find, among other things, the name and version of the package. Some of this meta-information allows them to determine if it is possible to install or uninstall the programs inside, for example according to the list of packages already on the machine.
+				</div></li><li class="listitem"><div class="para"><p></p>
+					<code class="filename">data.tar.gz</code>. This archive contains all of the files to be extracted from the package; this is where the executable files, documentation, etc., are all stored. Some packages may use other compression formats, in which case the file will be named differently (<code class="filename">data.tar.bz2</code> for bzip2, <code class="filename">data.tar.xz</code> for XZ, <code class="filename">data.tar.lzma</code> for LZMA).
+				</div></li></ul></div></div></div><div id="site_footer"></div><script type="text/javascript">
+		$("#site_footer").load("../../../../../footer.html");
+	</script><ul class="docnav"><li class="previous"><a accesskey="p" href="sect.after-first-boot.html"><strong>Prev</strong>4.3. After the First Boot</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="sect.package-meta-information.html"><strong>Next</strong>5.2. Package Meta-Information</a></li></ul></body></html>

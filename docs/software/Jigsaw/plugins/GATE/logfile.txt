@@ -1,0 +1,28 @@
+22 16:53:01 INFO  gate.Gate                     : Using . as GATE home
+22 16:53:01 INFO  gate.Gate                     : Using .\plugins\GATE as installed plug-ins directory.
+22 16:53:01 INFO  gate.Gate                     : Using .\plugins\GATE\gate.xml as site configuration file.
+22 16:53:01 INFO  gate.Gate                     : Using .\plugins\GATE\gate.user.xml as user configuration file
+22 16:53:01 INFO  gate.Gate                     : Using .\plugins\GATE\gate.session as user session file
+22 16:53:02 INFO  gate.creole.CreoleRegisterImpl: CREOLE plugin loaded: file:/C:/Users/Carsten/home/JigsawObfuscation/Jigsaw/./plugins/GATE/ANNIE/
+22 16:53:02 INFO  gate.creole.CreoleRegisterImpl: CREOLE plugin loaded: file:/C:/Users/Carsten/home/JigsawObfuscation/Jigsaw/plugins/GATE/ANNIE/
+22 17:11:31 INFO  gate.Gate                     : Using . as GATE home
+22 17:11:31 INFO  gate.Gate                     : Using .\plugins\GATE as installed plug-ins directory.
+22 17:11:31 INFO  gate.Gate                     : Using .\plugins\GATE\gate.xml as site configuration file.
+22 17:11:31 INFO  gate.Gate                     : Using .\plugins\GATE\gate.user.xml as user configuration file
+22 17:11:31 INFO  gate.Gate                     : Using .\plugins\GATE\gate.session as user session file
+22 17:11:32 INFO  gate.creole.CreoleRegisterImpl: CREOLE plugin loaded: file:/C:/Users/Carsten/home/JigsawObfuscation/Jigsaw/./plugins/GATE/ANNIE/
+22 17:11:32 INFO  gate.creole.CreoleRegisterImpl: CREOLE plugin loaded: file:/C:/Users/Carsten/home/JigsawObfuscation/Jigsaw/plugins/GATE/ANNIE/
+22 17:22:05 INFO  gate.Gate                     : Using . as GATE home
+22 17:22:05 INFO  gate.Gate                     : Using .\plugins\GATE as installed plug-ins directory.
+22 17:22:05 INFO  gate.Gate                     : Using .\plugins\GATE\gate.xml as site configuration file.
+22 17:22:05 INFO  gate.Gate                     : Using .\plugins\GATE\gate.user.xml as user configuration file
+22 17:22:05 INFO  gate.Gate                     : Using .\plugins\GATE\gate.session as user session file
+22 17:22:06 INFO  gate.creole.CreoleRegisterImpl: CREOLE plugin loaded: file:/C:/Users/Carsten/home/JigsawObfuscation/Jigsaw/./plugins/GATE/ANNIE/
+22 17:22:06 INFO  gate.creole.CreoleRegisterImpl: CREOLE plugin loaded: file:/C:/Users/Carsten/home/JigsawObfuscation/Jigsaw/plugins/GATE/ANNIE/
+22 17:25:24 INFO  gate.Gate                     : Using . as GATE home
+22 17:25:24 INFO  gate.Gate                     : Using .\plugins\GATE as installed plug-ins directory.
+22 17:25:24 INFO  gate.Gate                     : Using .\plugins\GATE\gate.xml as site configuration file.
+22 17:25:24 INFO  gate.Gate                     : Using .\plugins\GATE\gate.user.xml as user configuration file
+22 17:25:24 INFO  gate.Gate                     : Using .\plugins\GATE\gate.session as user session file
+22 17:25:25 INFO  gate.creole.CreoleRegisterImpl: CREOLE plugin loaded: file:/C:/Users/Carsten/home/JigsawObfuscation/Jigsaw/./plugins/GATE/ANNIE/
+22 17:25:25 INFO  gate.creole.CreoleRegisterImpl: CREOLE plugin loaded: file:/C:/Users/Carsten/home/JigsawObfuscation/Jigsaw/plugins/GATE/ANNIE/
